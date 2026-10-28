@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Result — {{ r['student_name'] }} — EvalPro AI{% endblock %}
+
+{% block content %}
+{% set sim = r['similarity_score'] %}
+{% set band = 'high' if sim >= 65 else ('mid' if sim >= 40 else 'low') %}
+
+<div class="result-head">
+  <div>
+    <h1>{{ r['student_name'] }}</h1>
+    <div class="meta">Evaluated on {{ r['created_at'] }}</div>
+  </div>
+  <div class="head-actions">
+    <a href="{{ url_for('dashboard') }}" class="btn-secondary btn">← Dashboard</a>
+    <button type="button" class="btn btn-secondary" onclick="window.print()">Print</button>
+    <form method="POST" action="{{ url_for('delete_result', result_id=r['id']) }}" class="inline-form"
+          data-confirm-title="Delete this evaluation?"
+          data-confirm-body="{{ r['student_name'] }}’s evaluation and uploaded sheet will be permanently removed.">
+      <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+      <button type="submit" class="btn btn-ghost-danger">Delete</button>
+    </form>
+  </div>
+</div>
+
+<div class="score-panel">
+  <div class="stamp {{ band }}">
+    <div class="pct mono">{{ sim }}%</div>
+    <div class="pct-label">similarity</div>
+  </div>
+  <div class="score-detail">
+    <div class="marks mono">{{ r['marks_awarded'] }} <span>/ {{ r['max_marks'] }}</span></div>
+    <div class="marks-label">Marks awarded · Grade <b class="grade grade-{{ 'pass' if (r['marks_awarded']|grade(r['max_marks'])) != 'F' else 'fail' }}">{{ r['marks_awarded']|grade(r['max_marks']) }}</b></div>
+    <div class="bar bar-lg"><span class="{{ band }}" style="width: {{ r['marks_awarded']|pct(r['max_marks']) }}%"></span></div>
+    <div class="feedback-quote">{{ r['feedback'] }}</div>
+  </div>
+</div>
+
+<div class="section-label">Key terms matched with the reference answer</div>
+<div class="chip-row">
+  {% if key_terms %}
+    {% for term in key_terms %}
+      <span class="chip">{{ term }}</span>
+    {% endfor %}
+  {% else %}
+    <span class="chip-empty">No shared key terms were detected between the two answers.</span>
+  {% endif %}
+</div>
+
+<div class="compare-grid">
+  <div class="compare-panel">
+    <h4>Text read from the sheet</h4>
+    {% if ocr_failed %}
+      <div class="ocr-warning">OCR could not read this image clearly — the score above may be unreliable. Try a sharper, well-lit photo or scan.</div>
+    {% endif %}
+    <div class="body-text">{{ r['extracted_text'] }}</div>
+  </div>
+  <div class="compare-panel">
+    <h4>Reference answer</h4>
+    <div class="body-text">{{ r['model_answer'] }}</div>
+  </div>
+</div>
+
+<div class="section-label">Original uploaded sheet</div>
+{% if r['image_path']|is_pdf %}
+<iframe class="sheet-pdf" src="{{ url_for('uploaded_file', filename=r['image_path']) }}" title="Uploaded answer sheet for {{ r['student_name'] }}"></iframe>
+<p><a class="view-link" href="{{ url_for('uploaded_file', filename=r['image_path']) }}" target="_blank" rel="noopener">Open PDF in a new tab ↗</a></p>
+{% else %}
+<img class="sheet-image" src="{{ url_for('uploaded_file', filename=r['image_path']) }}" alt="Uploaded answer sheet for {{ r['student_name'] }}">
+{% endif %}
+
+<div class="result-actions">
+  <a class="btn" href="{{ url_for('upload') }}">Evaluate another sheet</a>
+</div>
+{% endblock %}

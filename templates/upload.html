@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}New evaluation — EvalPro AI{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <h1>New evaluation</h1>
+  <p class="eyebrow-line">Upload a scanned, photographed or PDF answer sheet to grade it automatically.</p>
+</div>
+
+<div class="upload-wrap card">
+  <form method="POST" enctype="multipart/form-data" data-loading-message="Evaluating your submission">
+    <div class="field">
+      <label for="student_name">Student name</label>
+      <input type="text" id="student_name" name="student_name" placeholder="e.g. Kartik Kumar" required>
+    </div>
+
+    <div class="field">
+      <label for="answer_sheet">Answer sheet (image or PDF)</label>
+      <div class="dropzone" id="dropzone">
+        <div class="dz-icon">📄</div>
+        <div class="dz-text">Drag a scan, photo or PDF here, or click to browse<br>PNG, JPG or PDF · up to 20 MB</div>
+        <div class="dz-filename"></div>
+        <input type="file" id="answer_sheet" name="answer_sheet" accept=".png,.jpg,.jpeg,.pdf" required>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="model_answer">Model / reference answer</label>
+      <textarea id="model_answer" name="model_answer" placeholder="Paste the correct or expected answer here..." required></textarea>
+    </div>
+
+    <div class="row-2">
+      <div class="field">
+        <label for="max_marks">Maximum marks</label>
+        <input type="number" id="max_marks" name="max_marks" value="{{ default_max_marks }}" min="1" step="0.5">
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-block">Evaluate answer sheet</button>
+  </form>
+</div>
+
+<div id="loading-overlay" class="loading-overlay">
+  <div class="spinner"></div>
+  <div>Reading the sheet and scoring the answer…</div>
+</div>
+{% endblock %}

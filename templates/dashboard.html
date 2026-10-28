@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — EvalPro AI{% endblock %}
+
+{% block content %}
+<div class="page-head page-head-row">
+  <div>
+    <h1>Dashboard</h1>
+    <p class="eyebrow-line">An overview of every answer sheet graded so far.</p>
+  </div>
+  <a href="{{ url_for('upload') }}" class="btn">+ New evaluation</a>
+</div>
+
+<div class="stat-grid">
+  <div class="stat-card">
+    <div class="stat-num mono">{{ stats.total }}</div>
+    <div class="stat-label">Evaluations recorded</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num mono">{{ stats.avg_score }}%</div>
+    <div class="stat-label">Average similarity score</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num mono">{{ stats.this_week }}</div>
+    <div class="stat-label">Graded in the last 7 days</div>
+  </div>
+</div>
+
+<div class="ledger">
+  <div class="ledger-head">
+    <div>
+      <h3>Evaluation history</h3>
+      <span class="count mono" id="row-count">{{ results|length }} total</span>
+    </div>
+    {% if results %}
+    <div class="toolbar">
+      <input type="search" id="table-search" class="search" placeholder="Search student…" aria-label="Search students">
+      <form method="POST" action="{{ url_for('delete_selected') }}" id="bulk-form"
+            data-confirm-title="Delete selected evaluations?"
+            data-confirm-body="The selected evaluations and their uploaded sheets will be permanently removed.">
+        <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+        <button type="submit" class="btn btn-danger btn-sm" id="bulk-delete" disabled>Delete selected <span id="sel-count"></span></button>
+      </form>
+      <form method="POST" action="{{ url_for('delete_all') }}"
+            data-confirm-title="Delete ALL evaluations?"
+            data-confirm-body="Every evaluation and uploaded sheet will be permanently removed. This cannot be undone.">
+        <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+        <button type="submit" class="btn btn-ghost-danger btn-sm">Delete all</button>
+      </form>
+    </div>
+    {% endif %}
+  </div>
+
+  {% if results %}
+  <div class="table-scroll">
+  <table id="results-table">
+    <thead>
+      <tr>
+        <th class="col-check"><input type="checkbox" id="select-all" aria-label="Select all"></th>
+        <th>Student</th>
+        <th>Similarity</th>
+        <th>Marks</th>
+        <th>Grade</th>
+        <th>Date</th>
+        <th class="col-actions">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in results %}
+      {% set sim = r['similarity_score'] %}
+      {% set g = r['marks_awarded']|grade(r['max_marks']) %}
+      <tr data-name="{{ r['student_name']|lower }}">
+        <td class="col-check"><input type="checkbox" class="row-check" name="ids" value="{{ r['id'] }}" form="bulk-form" aria-label="Select {{ r['student_name'] }}"></td>
+        <td class="cell-name"><a href="{{ url_for('result', result_id=r['id']) }}">{{ r['student_name'] }}</a></td>
+        <td>
+          <div class="row-score">
+            <span class="dot {{ 'high' if sim >= 65 else ('mid' if sim >= 40 else 'low') }}"></span>
+            <span class="score-val">{{ sim }}%</span>
+          </div>
+        </td>
+        <td>
+          <div class="marks-cell">
+            <span class="mono">{{ r['marks_awarded'] }} / {{ r['max_marks'] }}</span>
+            <div class="bar"><span class="{{ 'high' if sim >= 65 else ('mid' if sim >= 40 else 'low') }}" style="width: {{ r['marks_awarded']|pct(r['max_marks']) }}%"></span></div>
+          </div>
+        </td>
+        <td><span class="grade grade-{{ 'pass' if g != 'F' else 'fail' }}">{{ g }}</span></td>
+        <td class="cell-date">{{ r['created_at'] }}</td>
+        <td class="col-actions">
+          <a class="icon-btn" href="{{ url_for('result', result_id=r['id']) }}">View</a>
+          <form method="POST" action="{{ url_for('delete_result', result_id=r['id']) }}" class="inline-form"
+                data-confirm-title="Delete this evaluation?"
+                data-confirm-body="{{ r['student_name'] }}’s evaluation and uploaded sheet will be permanently removed.">
+            <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+            <button type="submit" class="icon-btn danger">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="empty-state" id="no-match" hidden>
+    <h4>No matching students</h4>
+    <p>Try a different search term.</p>
+  </div>
+  </div>
+  {% else %}
+    <div class="empty-state">
+      <h4>No evaluations yet</h4>
+      <p>Upload your first answer sheet to see it graded here.</p>
+      <a href="{{ url_for('upload') }}" class="btn">New evaluation</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

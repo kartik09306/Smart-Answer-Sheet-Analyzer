@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Log in — EvalPro AI</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='none' stroke='%231B2438' stroke-width='2'/%3E%3Cpath d='M9 16.5l4.5 4.5L23 11' fill='none' stroke='%231B2438' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+</head>
+<body>
+  <div class="login-shell">
+    <div class="login-panel-brand">
+      <div class="brand">
+        <span class="brand-mark">✓</span>
+        EvalPro AI
+      </div>
+
+      <div class="seal-wrap">
+        <svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle cx="90" cy="90" r="86" stroke="#5B6B96" stroke-width="1.5" stroke-dasharray="2 5"/>
+          <circle cx="90" cy="90" r="70" stroke="#8493BD" stroke-width="1.5"/>
+          <path d="M58 92l22 22 42-46" stroke="#EDEFF5" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+
+      <div>
+        <p class="tagline">Every answer sheet, read, scored and annotated automatically.</p>
+        <p class="footnote" style="margin-top:18px;">Smart Answer Sheet Analyzer · OCR + semantic evaluation</p>
+      </div>
+    </div>
+
+    <div class="login-panel-form">
+      <div class="login-card">
+        <h1>Teacher login</h1>
+        <p class="sub">Sign in to grade and review answer sheets.</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <form method="POST">
+          <div class="field">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" placeholder="teacher" required autofocus>
+          </div>
+          <div class="field">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" placeholder="••••••••" required>
+          </div>
+          <button type="submit" class="btn btn-block">Log in</button>
+        </form>
+
+        <div class="demo-hint">
+          Demo credentials — username <b>teacher</b>, password <b>admin123</b>.
+          Change these in <code>app.py</code> before any real deployment.
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

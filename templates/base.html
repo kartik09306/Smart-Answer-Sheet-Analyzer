@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}EvalPro AI{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='none' stroke='%231B2438' stroke-width='2'/%3E%3Cpath d='M9 16.5l4.5 4.5L23 11' fill='none' stroke='%231B2438' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <div class="topbar">
+    <a href="{{ url_for('dashboard') }}" class="brand">
+      <span class="brand-mark">✓</span>
+      EvalPro AI
+    </a>
+    <div class="nav-links">
+      <a href="{{ url_for('dashboard') }}" class="{{ 'primary' if active_nav == 'dashboard' else '' }}">Dashboard</a>
+      <a href="{{ url_for('upload') }}" class="{{ 'primary' if active_nav == 'upload' else '' }}">New evaluation</a>
+      <span class="nav-sep"></span>
+      <span class="user-chip"><span class="avatar">{{ (session.get('username') or 'T')[:1]|upper }}</span>{{ session.get('username') or 'teacher' }}</span>
+      <a href="{{ url_for('logout') }}">Log out</a>
+    </div>
+  </div>
+
+  <div class="page">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </div>
+
+  <div class="modal-backdrop" id="confirm-modal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+      <div class="modal-icon">!</div>
+      <h3 id="confirm-title">Delete evaluation?</h3>
+      <p id="confirm-body">This cannot be undone.</p>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" data-modal-cancel>Cancel</button>
+        <button type="button" class="btn btn-danger" data-modal-confirm>Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>
