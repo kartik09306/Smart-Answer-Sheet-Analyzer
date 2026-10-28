@@ -5,3 +5,6 @@ __pycache__/
 .env
 instance/
 .pytest_cache/
+.vscode/
+evalpro.db
+uploads/*
