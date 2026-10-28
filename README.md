@@ -1,3 +1,4 @@
+
 # EvalPro AI – Smart Answer Sheet Analyzer
 
 Mini Project (BCC351) — Group No. 32
@@ -99,6 +100,7 @@ export EVALPRO_SECRET_KEY="a-long-random-string"
 ## 5. What changed in this makeover
 
 **Fixed:**
+
 - `evaluator.py` was missing `import re`, which crashed every single
   upload (`NameError` inside `clean_text`).
 - The Tesseract path was hardcoded to a Windows-only location and applied
@@ -114,6 +116,7 @@ export EVALPRO_SECRET_KEY="a-long-random-string"
   grading garbled text as a real answer.
 
 **Added:**
+
 - A from-scratch visual redesign across all four pages (login, dashboard,
   upload, result) with a shared `base.html` layout, a real design system
   in `static/style.css`, and small interaction touches in `static/app.js`

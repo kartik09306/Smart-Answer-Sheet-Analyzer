@@ -1,8 +1,7 @@
-__pycache__/
-*.pyc
 venv/
 .venv/
-evalpro.db
-uploads/*
-!uploads/.gitkeep
-.vscode/
+__pycache__/
+*.py[cod]
+.env
+instance/
+.pytest_cache/
